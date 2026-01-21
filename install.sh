@@ -5,6 +5,7 @@ INSTALL_DIR="${HOME}/.proxy-science"
 PROXY_SCRIPT="proxy.sh"
 CLAUDECODE_PROXY_SCRIPT="claudecode-proxy.sh"
 DEFAULT_SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${0}}")" && pwd)"
+REPO_BASE_URL="${PROXY_SCIENCE_BASE_URL:-https://raw.githubusercontent.com/leason-wan/proxy-science/main}"
 
 PROXY_SNIPPET='[ -s "$HOME/.proxy-science/proxy.sh" ] && source "$HOME/.proxy-science/proxy.sh"'
 CLAUDECODE_SNIPPET='[ -s "$HOME/.proxy-science/claudecode-proxy.sh" ] && source "$HOME/.proxy-science/claudecode-proxy.sh"'
@@ -21,7 +22,8 @@ copy_scripts() {
     log "Installing proxy.sh"
     command cp -f "${script_path}" "${INSTALL_DIR}/${PROXY_SCRIPT}"
   else
-    log "Warning: ${PROXY_SCRIPT} not found, skipping"
+    log "proxy.sh not found locally; downloading from ${REPO_BASE_URL}"
+    download_script "${PROXY_SCRIPT}"
   fi
 
   local claudecode_script_path="${DEFAULT_SOURCE_DIR}/${CLAUDECODE_PROXY_SCRIPT}"
@@ -29,7 +31,23 @@ copy_scripts() {
     log "Installing claudecode-proxy.sh"
     command cp -f "${claudecode_script_path}" "${INSTALL_DIR}/${CLAUDECODE_PROXY_SCRIPT}"
   else
-    log "Warning: ${CLAUDECODE_PROXY_SCRIPT} not found, skipping"
+    log "claudecode-proxy.sh not found locally; downloading from ${REPO_BASE_URL}"
+    download_script "${CLAUDECODE_PROXY_SCRIPT}"
+  fi
+}
+
+download_script() {
+  local script_name="$1"
+  local target_path="${INSTALL_DIR}/${script_name}"
+  local url="${REPO_BASE_URL}/${script_name}"
+
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "${url}" -o "${target_path}"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "${target_path}" "${url}"
+  else
+    log "Error: curl or wget is required to download ${script_name}"
+    return 1
   fi
 }
 

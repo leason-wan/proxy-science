@@ -1,8 +1,8 @@
 # === 代理 开/关/状态 ===
 proxy_on() {
-  export http_proxy="http://192.168.10.20:7890"
-  export https_proxy="http://192.168.10.20:7890"
-  export all_proxy="socks5://192.168.10.20:7890"
+  export http_proxy="http://127.0.0.1:7890"
+  export https_proxy="http://127.0.0.1:7890"
+  export all_proxy="socks5://127.0.0.1:7890"
 
   # 兼容用大写变量的程序
   export HTTP_PROXY="$http_proxy"
